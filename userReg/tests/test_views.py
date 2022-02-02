@@ -3,12 +3,14 @@ from userReg.tests.test_setup import TestSetUp
 from django.core.files.uploadedfile import SimpleUploadedFile
 import json
 import ast
+import os
 
 
 class TestViews(TestSetUp):
     def test_user_is_created_wfu(self):
         """
         To test user is created without file upload
+        this also affirms that user model is working
         """
         res = self.client.post(self.userReg_url,self.user_data, format ="json")
     
@@ -26,7 +28,8 @@ class TestViews(TestSetUp):
         json_data["avatar"] = avatar
         self.client.post(self.userReg_url,data=json_data,  format="multipart")
         uploadedUrl = userData.objects.get(username=self.user_data["username"]).imageURL()
+        os.remove(uploadedUrl) # delete uploaded file
         org_URL = str(self.imageUrl)
-        org_filename = org_URL.split('/')[-3:][2].split('.')[0] #origin file name
-        uploaded_filename = uploadedUrl.split('/')[-3:][2].split('_')[0]#uploaded filename
+        org_filename = org_URL.split('/')[-3:][2]#origin file name
+        uploaded_filename = uploadedUrl.split('/')[-3:][2]#uploaded filename
         self.assertEqual(uploaded_filename,org_filename)  
